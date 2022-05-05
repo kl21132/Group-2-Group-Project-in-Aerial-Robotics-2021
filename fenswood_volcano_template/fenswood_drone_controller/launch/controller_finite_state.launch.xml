@@ -1,0 +1,5 @@
+<launch>
+  <node pkg="fenswood_drone_controller" exec="controller_finite_state" />
+  <node pkg="fenswood_drone_controller" exec="image_processor"/>
+  <node pkg="fenswood_drone_controller" exec="failsafe"/>
+</launch>

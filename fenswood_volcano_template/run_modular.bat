@@ -1,0 +1,1 @@
+docker-compose -f docker-compose-modular.yml up --build
