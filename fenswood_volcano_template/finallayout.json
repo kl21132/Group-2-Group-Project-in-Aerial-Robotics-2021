@@ -1,0 +1,149 @@
+{
+  "configById": {
+    "RosOut!14hjs3s": {
+      "searchTerms": [],
+      "minLogLevel": 1
+    },
+    "map!21srxay": {
+      "disabledTopics": [],
+      "layer": "map",
+      "zoomLevel": 18
+    },
+    "StateTransitions!wsk9ct": {
+      "paths": [
+        {
+          "value": "/vehicle_1/mavros/state.armed",
+          "timestampMethod": "receiveTime"
+        },
+        {
+          "value": "/vehicle_1/mavros/state.mode",
+          "timestampMethod": "receiveTime"
+        },
+        {
+          "value": "/vehicle_1/mavros/state.guided",
+          "timestampMethod": "receiveTime"
+        }
+      ]
+    },
+    "Table!3bjnktr": {
+      "topicPath": "/vehicle_1/mavros/global_position/global"
+    },
+    "ImageViewPanel!3j0dzqr": {
+      "cameraTopic": "/vehicle_1/camera/image_raw",
+      "enabledMarkerTopics": [],
+      "mode": "fit",
+      "pan": {
+        "x": 0,
+        "y": 0
+      },
+      "rotation": 0,
+      "synchronize": false,
+      "transformMarkers": false,
+      "zoom": 1
+    },
+    "GlobalVariableSliderPanel!3m064ga": {
+      "sliderProps": {
+        "min": 0,
+        "max": 10,
+        "step": 1
+      },
+      "globalVariableName": "globalVariable"
+    },
+    "GlobalVariableSliderPanel!2o7qmez": {
+      "sliderProps": {
+        "min": 0,
+        "max": 10,
+        "step": 1
+      },
+      "globalVariableName": "globalVariable"
+    },
+    "Teleop!1bv5hd8": {
+      "topic": "/vehicle_1/mavros/setpoint_velocity/cmd_vel_unstamped",
+      "publishRate": 1,
+      "upButton": {
+        "field": "linear-z",
+        "value": 1
+      },
+      "downButton": {
+        "field": "linear-x",
+        "value": -1
+      },
+      "leftButton": {
+        "field": "angular-z",
+        "value": 0.1
+      },
+      "rightButton": {
+        "field": "angular-z",
+        "value": -0.1
+      }
+    },
+    "Teleop!3sq2tnl": {
+      "topic": "/vehicle_1/mavros/setpoint_velocity/cmd_vel_unstamped",
+      "publishRate": 1,
+      "upButton": {
+        "field": "linear-y",
+        "value": 1
+      },
+      "downButton": {
+        "field": "linear-x",
+        "value": -1
+      },
+      "leftButton": {
+        "field": "angular-z",
+        "value": 0.1
+      },
+      "rightButton": {
+        "field": "angular-z",
+        "value": -0.1
+      }
+    }
+  },
+  "globalVariables": {
+    "globalVariable": 0
+  },
+  "userNodes": {},
+  "linkedGlobalVariables": [],
+  "playbackConfig": {
+    "speed": 1,
+    "messageOrder": "receiveTime"
+  },
+  "layout": {
+    "direction": "row",
+    "first": "RosOut!14hjs3s",
+    "second": {
+      "first": {
+        "first": "map!21srxay",
+        "second": {
+          "first": "StateTransitions!wsk9ct",
+          "second": "Table!3bjnktr",
+          "direction": "column",
+          "splitPercentage": 60.797342192691026
+        },
+        "direction": "column",
+        "splitPercentage": 61.4596670934699
+      },
+      "second": {
+        "first": {
+          "first": "ImageViewPanel!3j0dzqr",
+          "second": {
+            "first": "GlobalVariableSliderPanel!3m064ga",
+            "second": "GlobalVariableSliderPanel!2o7qmez",
+            "direction": "row"
+          },
+          "direction": "column",
+          "splitPercentage": 73.52415026833631
+        },
+        "second": {
+          "first": "Teleop!1bv5hd8",
+          "second": "Teleop!3sq2tnl",
+          "direction": "row"
+        },
+        "direction": "column",
+        "splitPercentage": 73.8796414852753
+      },
+      "direction": "row",
+      "splitPercentage": 51.42865498786301
+    },
+    "splitPercentage": 21.855350510338372
+  }
+}
