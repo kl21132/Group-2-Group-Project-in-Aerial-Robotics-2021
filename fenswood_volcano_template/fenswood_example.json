@@ -1,0 +1,129 @@
+{
+  "layout": {
+    "first": "RosOut!1ukq7ht",
+    "second": {
+      "direction": "row",
+      "first": {
+        "first": {
+          "first": "RawMessages!l9dzdw",
+          "second": "Publish!k6u9bw",
+          "direction": "column"
+        },
+        "second": "RawMessages!2p23zee",
+        "direction": "column",
+        "splitPercentage": 67.21174825198484
+      },
+      "second": {
+        "first": "ImageViewPanel!4evmpi6",
+        "second": {
+          "first": "Teleop!2w01x4n",
+          "second": "Teleop!3405ric",
+          "direction": "row"
+        },
+        "direction": "column",
+        "splitPercentage": 64.9944534642905
+      },
+      "splitPercentage": 42.85714100580901
+    },
+    "direction": "row",
+    "splitPercentage": 45.98457747285548
+  },
+  "configById": {
+    "RosOut!1ukq7ht": {
+      "searchTerms": [],
+      "minLogLevel": 2
+    },
+    "RawMessages!l9dzdw": {
+      "topicPath": "/vehicle_1/mavros/global_position/global",
+      "diffTopicPath": "",
+      "diffMethod": "custom",
+      "diffEnabled": false,
+      "showFullMessageForDiff": false
+    },
+    "Publish!k6u9bw": {
+      "topicName": "/vehicle_1/gimbal_tilt_cmd",
+      "datatype": "std_msgs/msg/Float32",
+      "buttonText": "Publish",
+      "buttonTooltip": "",
+      "buttonColor": "#00A871",
+      "advancedView": true,
+      "value": "{\n  \"data\": 0\n}"
+    },
+    "RawMessages!2p23zee": {
+      "topicPath": "/vehicle_1/mavros/state",
+      "diffTopicPath": "",
+      "diffMethod": "custom",
+      "diffEnabled": false,
+      "showFullMessageForDiff": false
+    },
+    "ImageViewPanel!4evmpi6": {
+      "cameraTopic": "/vehicle_1/camera/image_raw/compressed",
+      "enabledMarkerTopics": [],
+      "customMarkerTopicOptions": [],
+      "scale": 0.2,
+      "transformMarkers": true,
+      "synchronize": false,
+      "mode": "fit",
+      "zoomPercentage": 31.5,
+      "offset": [
+        0,
+        3.3599999999999994
+      ],
+      "pan": {
+        "x": 0,
+        "y": 1.0000000000000284
+      },
+      "zoom": 0.9999999999999999
+    },
+    "Teleop!2w01x4n": {
+      "topic": "/vehicle_1/mavros/setpoint_velocity/cmd_vel_unstamped",
+      "publishRate": 5,
+      "upButton": {
+        "field": "linear-z",
+        "value": 1
+      },
+      "downButton": {
+        "field": "linear-z",
+        "value": -1
+      },
+      "leftButton": {
+        "field": "angular-z",
+        "value": 0.1
+      },
+      "rightButton": {
+        "field": "angular-z",
+        "value": -0.1
+      }
+    },
+    "Teleop!3405ric": {
+      "topic": "/vehicle_1/mavros/setpoint_velocity/cmd_vel_unstamped",
+      "publishRate": 5,
+      "upButton": {
+        "field": "linear-y",
+        "value": 1
+      },
+      "downButton": {
+        "field": "linear-y",
+        "value": -1
+      },
+      "leftButton": {
+        "field": "linear-x",
+        "value": -1
+      },
+      "rightButton": {
+        "field": "linear-x",
+        "value": 1
+      }
+    }
+  },
+  "globalVariables": {
+    "track_id": 34
+  },
+  "userNodes": {},
+  "linkedGlobalVariables": [],
+  "playbackConfig": {
+    "speed": 1,
+    "messageOrder": "receiveTime",
+    "timeDisplayMethod": "ROS"
+  }
+}

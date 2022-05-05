@@ -1,0 +1,1 @@
+docker-compose -f docker-compose-old-school.yml up --build
