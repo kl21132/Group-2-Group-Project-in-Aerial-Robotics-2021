@@ -2,7 +2,7 @@
 Very simple image processor based on example from
 https://automaticaddison.com/getting-started-with-opencv-in-ros-2-foxy-fitzroy-python/
 """
-#from turtle import delay
+# from turtle import delay
 import rclpy                                                    # type: ignore
 from rclpy.node import Node
 from sensor_msgs.msg import Image
@@ -126,7 +126,7 @@ class ImageProcessor(Node):
 
         # can do OpenCV stuff on img now
         shp = self.img.shape # just get the size
-        # self.get_logger().info('red zone: {}'.format(self.r_alert))
+        self.get_logger().info('red zone: {}'.format(self.r_alert))
         self.img_pub_()
         self.red_pub_()
         self.yellow_pub_()

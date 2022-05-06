@@ -27,7 +27,7 @@ class FailSafe(Node):
 
     def md_timer_callback(self): 
         self.md_publisher_.publish(self.md)
-        # self.get_logger().info('md: {}'.format(self.md.data))
+        self.get_logger().info('md: {}'.format(self.md.data))
     
     # def img_pub_(self):
           

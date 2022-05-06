@@ -1,4 +1,3 @@
-# from turtle import right
 import rclpy                                                    # type: ignore
 from rclpy.node import Node
 
@@ -105,12 +104,8 @@ class FenswoodDroneController(Node):
         self.img_publisher_ = self.create_publisher(Image, 'status_frames', 10)
         self.md_publisher_ = self.create_publisher(String, 'failsafe_md', 10)
         self.md = String()
-        self.red = String()
-        self.yellow = String()
-        # self.md.data = None
+        self.md.data = "stand by"
         self.br = CvBridge()
-        # self.r_dir = []
-        # self.y_dir = []
 
         # create service clients for long command (datastream requests)...
         self.cmd_cli = self.create_client(CommandLong, '/vehicle_1/mavros/cmd/command')
@@ -142,27 +137,11 @@ class FenswoodDroneController(Node):
         self.control_state = 'init'
         # timer for time spent in each state
         self.state_timer = 0
-    
-    def md_pub(self):
-       self.md_timer_ = self.create_timer(8, self.md_timer_callback) 
-
-    def md_timer_callback(self): 
-        self.md_publisher_.publish(self.md)
-        self.get_logger().info('md: {}'.format(self.md.data))
         
     # on receiving status message, save it to global
     def state_callback(self,msg):
         self.last_status = msg
         self.get_logger().debug('Mode: {}.  Armed: {}.  System status: {}'.format(msg.mode,msg.armed,msg.system_status))
-    
-    def failsafe_callback(self,msg):
-        self.md.data = msg.data
-
-    def red_state_callback(self,msg):
-        self.red.data = msg.data
-
-    def yellow_state_callback(self,msg):
-        self.yellow.data = msg.data
 
     # on receiving positon message, save it to global
     def position_callback(self,msg):
@@ -236,18 +215,15 @@ class FenswoodDroneController(Node):
         self.target_twist_pub.publish(self.last_twist)
         self.get_logger().info('Set drone to {}'.format(yawz)) 
 
-    def linear_move_x(self,linx):
+    def linear_move(self,linx):
         self.last_twist.linear.x =linx
         self.target_twist_pub.publish(self.last_twist)
-        self.get_logger().info('Set drone to {}'.format(linx))
-
-    def linear_move_y(self,liny):
-        self.last_twist.linear.y =liny
-        self.target_twist_pub.publish(self.last_twist)
-        self.get_logger().info('Set drone to {}'.format(liny)) 
+        self.get_logger().info('Set drone to {}'.format(linx)) 
 
     def state_transition(self):
         if self.control_state =='init':
+            self.md.data= 'stand by'
+            self.get_logger().info('Request sent for stand by mode.')
             if self.last_status.system_status==3:
                 self.get_logger().info('Drone initialized')
                 # send command to request regular position updates
@@ -263,15 +239,18 @@ class FenswoodDroneController(Node):
             else:
                 return('init')
 
-        elif self.control_state == 'arming':     
-            if self.last_status.armed and self.md.data== 'take off':
+        elif self.control_state == 'arming':
+            self.md.data= 'stand by'
+            self.get_logger().info('Request sent for stand by mode.')
+            
+            if self.last_status.armed:
                 self.get_logger().info('Arming successful')
                 if self.last_pos:
                     self.init_alt = self.last_pos.altitude
                 self.takeoff(20.0)
                 self.get_logger().info('Takeoff request sent.')
                 return('climbing')
-            elif self.state_timer > 300:                # timeout
+            elif self.state_timer > 60:                # timeout
                 self.get_logger().error('Failed to arm')
                 return('exit')
             else:
@@ -280,23 +259,21 @@ class FenswoodDroneController(Node):
                 return('arming')
 
         elif self.control_state == 'climbing':
-            if self.md.data == 'take off':
-                self.get_logger().info('Request sent for take off mode.')
-                if self.last_alt_rel > 19.0:
-                    self.get_logger().info('Close enough to flight altitude')
-                    self.flyto(waypoints[0][0], waypoints[0][1], self.init_alt - 30.0) # unexplained correction factor on altitude
-                    self.md.data='stand by'
-                    self.md_pub()
-                    return('on_way1')
-                elif self.state_timer > 300:                # timeout
-                    self.get_logger().error('Failed to reach altitude')
-                    return('RTH')
-                else:
-                    self.get_logger().info('Climbing, altitude {}m'.format(self.last_alt_rel))
-                    return('climbing')
+            self.md.data= 'take off'
+            self.get_logger().info('Request sent for take off mode.')
+            if self.last_alt_rel > 19.0:
+                self.get_logger().info('Close enough to flight altitude')
+                self.flyto(waypoints[0][0], waypoints[0][1], self.init_alt - 30.0) # unexplained correction factor on altitude
+                return('on_way1')
+            elif self.state_timer > 60:                # timeout
+                self.get_logger().error('Failed to reach altitude')
+                return('RTH')
+            else:
+                self.get_logger().info('Climbing, altitude {}m'.format(self.last_alt_rel))
+                return('climbing')
 
-        elif self.control_state == 'on_way1' and self.md.data == 'stand by':
-            # self.md.data= 'stand by'
+        elif self.control_state == 'on_way1':
+            self.md.data= 'stand by'
             self.get_logger().info('Request sent for stand by mode.')
             fail=0
             for waypoint in waypoints:
@@ -309,7 +286,7 @@ class FenswoodDroneController(Node):
                     if (abs(d_lon) < 0.00001) & (abs(d_lat) < 0.00001):
                         self.get_logger().info('Close enough to target delta={},{}'.format(d_lat,d_lon))
                         break
-                    elif self.state_timer > 300:                        # timeout
+                    elif self.state_timer > 60:                        # timeout
                         self.get_logger().error('Failed to reach target')
                         fail+=1
                         break
@@ -323,10 +300,10 @@ class FenswoodDroneController(Node):
 
 
         elif self.control_state == 'on_way2':
-            # self.md.data= 'stand by'
+            self.md.data= 'stand by'
             self.get_logger().info('Request sent for stand by mode.')
-            self.yaw(-0.90)
-            for try_yaw in range(120):
+            self.yaw(-0.70)
+            for try_yaw in range(3):
                 self.wait_for_new_status()
                 self.get_logger().info('yaw {}'.format(self.last_twist.angular.z))
 
@@ -335,74 +312,29 @@ class FenswoodDroneController(Node):
                 self.wait_for_new_status()
                 self.get_logger().info('yaw {}'.format(self.last_twist.angular.z))
 
-            for try_move in range(500):
+            for try_move in range(60):
                 self.wait_for_new_status()
+                current_coor=(self.last_pos.latitude, self.last_pos.longitude)
+                dist=geopy.distance.geodesic(Area_of_Interest, current_coor).m
+                if dist>45.0 and dist<40.0:
+                    self.linear_move(0.0)
+                    self.get_logger().info('ready to land')
+                    break
+                elif dist<40.0:
+                    self.linear_move(5.0)
+                    self.get_logger().info('ready to land')
+                    break
+                elif self.state_timer > 60:                        # timeout
+                    self.get_logger().error('failed to reach target')
+                    break
+                else:
+                    self.linear_move(-5.0)
+                    self.get_logger().info('Target error radius {}m'.format(dist))
 
-                r_dir = self.red.data.split()
-                y_dir = self.yellow.data.split()
+            return('landing')
 
-                
-                try:
-                    if r_dir[1] == '-2' or r_dir[1] == '2': 
-                        self.linear_move_y(0.0)
-                        # self.get_logger().info('ready to land, waiting user confirmation')
-                        
-                    elif r_dir[1] == '-1' :
-                        self.linear_move_y(1.0)
-                    elif r_dir[1] == '1' :
-                        self.linear_move_y(-1.0)
-
-                except:
-                    current_coor=(self.last_pos.latitude, self.last_pos.longitude)
-                    dist=geopy.distance.geodesic(Area_of_Interest, current_coor).m
-                    if dist>45.0 and dist<40.0:
-                        self.linear_move_x(0.0)
-                    else:
-                        self.linear_move_x(-2.0)
-                        self.linear_move_y(2.0)
-
-                    # if r_dir[1] == '-1' :
-                    #     if y_dir[1] =='-1':
-                    #         while r_dir[1] != '-2':  #51.421835, -2.667913 
-                    #             self.linear_move_x(0.1)
-                    #     else:
-                    #         while r_dir[1] != '-2':  #51.421835, -2.667913 
-                    #             self.linear_move_x(-0.1)
-                        
-                    
-                    # elif r_dir[1] == '1': 
-                    #     if y_dir[1] =='1':
-                    #         while r_dir[1] != '2':  #51.421835, -2.667913 
-                    #             self.linear_move_x(-0.1)
-                    #     else:
-                    #         while r_dir[1] != '-2':  #51.421835, -2.667913 
-                    #             self.linear_move_x(0.1)
-
-
-            #     current_coor=(self.last_pos.latitude, self.last_pos.longitude)
-            #     dist=geopy.distance.geodesic(Area_of_Interest, current_coor).m
-            #     if dist>45.0 and dist<40.0:
-            #         self.linear_move(0.0)
-            #         self.get_logger().info('ready to land, waiting user confirmation')
-            #         break
-            #     elif dist<40.0:
-            #         self.linear_move(5.0)
-            #         self.get_logger().info('ready to land, waiting user confirmation')
-            #         break
-            #     elif self.state_timer > 60:                        # timeout
-            #         self.get_logger().error('failed to reach target')
-            #         break
-            #     else:
-            #         self.linear_move(-5.0)
-            #         self.get_logger().info('Target error radius {}m'.format(dist))
-
-            return('landing')            
-
-        elif self.control_state == 'landing' or self.md.data== 'land':
-            self.change_mode("LAND")
-            self.get_logger().info('Request sent for land mode.')
-
-        elif self.control_state == 'RTH' or self.md.data== 'rth':
+        elif self.control_state == 'RTH':
+            self.md.data= 'rth'
             self.get_logger().info('Request sent for rth mode.')
             RTLwaypoints=waypoints[::-1]
             self.flyto(RTLwaypoints[0][0],RTLwaypoints[0][1],self.init_alt - 30.0)
@@ -418,19 +350,27 @@ class FenswoodDroneController(Node):
                             break
             self.change_mode("RTL")
             return('exit')
+            
+
+        elif self.control_state == 'landing':
+            self.md.data= 'hover'
+            self.get_logger().info('Request sent for hover mode.')
+            self.change_mode("LAND")
+            self.get_logger().info('Request sent for GUIDED mode.')
+
+
+        elif self.control_state == 'exit':
+            # nothing else to do
+            return('exit')
 
     def run(self):
 
         # set up subscribers
-        red_zone = self.create_subscription(String, '/red_zone_alert', self.red_state_callback, 10)
-        yellow_zone = self.create_subscription(String, '/yellow_zone_alert', self.yellow_state_callback, 10)
-
         state_sub = self.create_subscription(State, '/vehicle_1/mavros/state', self.state_callback, 10)
         pos_sub = self.create_subscription(NavSatFix, '/vehicle_1/mavros/global_position/global', self.position_callback, 10)
         loc_pos_sub = self.create_subscription(PoseStamped, '/vehicle_1/mavros/local_position/pose', self.local_pose_callback, 10)
         twist_sub = self.create_subscription(TwistStamped, '/vehicle_1/mavros/setpoint_velocity/cmd_vel_unstamped', self.twist_callback, 10)
-        state_sub = self.create_subscription(String, '/failsafe_md', self.failsafe_callback, 10)
-        
+
         for try_loop in range(600):
             if rclpy.ok():
                 self.wait_for_new_status()
