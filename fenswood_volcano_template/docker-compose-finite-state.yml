@@ -10,8 +10,6 @@ services:
     image: uobflightlabstarling/starling-sim-iris-ap-fenswood:latest
     environment:
       - AP_SITL_HOST=sitl
-      - SPAWN_TARGET_ANNULUS_LOC_X=-150
-      - SPAWN_TARGET_ANNULUS_LOC_Y=-200
     ports:
       - "8080:8080"
 
